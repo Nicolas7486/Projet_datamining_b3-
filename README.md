@@ -1,58 +1,46 @@
-# Projet_datamining_b3-
+City Cycle – Projet Data Mining B3
 
-# City Cycle – Projet Data Mining B3
-
-## 1. Présentation du projet
+1. Présentation du projet
 
 Ce projet consiste à analyser les données du service de vélos en libre-service City Cycle dans le cadre du module Data Mining.
 
-## 2. Objectifs
+2. Objectifs
 
-- Explorer et comprendre les données.
-- Nettoyer et préparer les jeux de données.
-- Réaliser des analyses et appliquer des méthodes de Data Mining.
-- Interpréter les résultats obtenus.
+Explorer et comprendre les données.
+Nettoyer et préparer les jeux de données.
+Réaliser des analyses et appliquer des méthodes de Data Mining.
+Interpréter les résultats obtenus.
 
-## 3. Jeux de données
+3. Jeux de données
 
 Le projet utilise trois fichiers :
 
-- `Citycycle_stations.csv`
-- `Citycycle_trajets.csv`
-- `Citycycle_abonnes.csv`
+Citycycle_stations.csv
+Citycycle_trajets.csv
+Citycycle_abonnes.csv
 
-## 4. Organisation du dépôt
+4. Organisation du dépôt
 
-```text
 Projet_datamining_b3/
-│
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── notebooks/
-├── src/
-├── README.md
-├── .gitignore
-└── nettoyagedesdonnees.py
-```
 
-## 5. Méthodologie
+data/
+raw/
+processed/
 
-1. Compréhension des données
-2. Nettoyage des données
-3. Analyse exploratoire
-4. Application des méthodes de Data Mining
-5. Évaluation et interprétation des résultats
+notebooks/
 
-## 6. Outils utilisés
+src/
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- GitHub
+README.md
 
-## 7. Équipe
+.gitignore
 
-À compléter avec les noms des membres du groupe.
+nettoyagedesdonnees.py
+
+5. Méthodologie
+
+Compréhension des données
+Nettoyage des données
+Analyse exploratoire
+Application des méthodes de Data Mining
+Évaluation et interprétation des résultats
