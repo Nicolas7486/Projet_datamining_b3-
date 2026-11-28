@@ -1,0 +1,161 @@
+
+===== Q1 =====
+                    interventions_mois  departs  solde
+interventions_mois                1.00    -0.13  -0.02
+departs                          -0.13     1.00   0.73
+solde                            -0.02     0.73   1.00
+               interventions_mois  departs  arrivees
+type_quartier                                       
+bureaux                      3.90     5.39      4.90
+gare                        11.48     4.38      4.48
+résidentiel                  3.85     4.56      5.15
+université                   4.21     5.34      5.34
+Départs par quartier et créneau :
+creneau          10-14h  15-18h  19-23h  5-6h  7-9h
+quartier_depart                                    
+bureaux              71      91      35    12    66
+gare                 23      29      12     6    22
+résidentiel          43      60      22     7    46
+université           36      57      26     6    30
+Solde par quartier sur toute la période :
+               departs  arrivees  solde
+type_quartier                          
+bureaux          275.0     250.0   25.0
+gare              92.0      94.0   -2.0
+résidentiel      178.0     201.0  -23.0
+université       155.0     155.0    0.0
+Important : l'heure disponible est celle du départ, pas l'heure réelle d'arrivée.
+
+===== Q2 =====
+Importance des variables :
+ heure       0.55
+jour        0.19
+quartier    0.26
+dtype: float64
+Vitesse moyenne selon pluie :
+ pluie
+0    10.03
+1     8.90
+Name: vitesse_kmh, dtype: float64
+Part des trajets en pointe selon pluie :
+ pluie
+0    0.38
+1    0.42
+Name: pointe, dtype: float64
+Limite : les données ne contiennent que les trajets réalisés.
+
+===== Q3 =====
+MAE modèle : 0.0708
+MAE moyenne : 0.0714
+Jour cible : 2026-11-29 dim ; total estimé : 6.16
+      station_id type_quartier  prevision  part_%
+10092      ST275          gare      0.145   2.353
+14614      ST309    université      0.130   2.111
+14348      ST307          gare      0.127   2.063
+5836       ST243       bureaux      0.124   2.006
+16210      ST321       bureaux      0.114   1.842
+3708       ST227   résidentiel      0.114   1.842
+12619      ST294       bureaux      0.112   1.824
+8230       ST261   résidentiel      0.107   1.744
+13284      ST299   résidentiel      0.102   1.662
+2777       ST220       bureaux      0.099   1.599
+Limite : sans dates calendaires, ce n'est pas une vraie prévision temporelle de demain.
+
+===== Q4 =====
+  jour_teste  erreur_modele  erreur_moyenne
+0        lun          0.976           1.281
+1        mar          1.029           1.170
+2        mer          1.076           1.134
+3        jeu          0.849           1.140
+4        ven          0.892           1.159
+5        sam          0.910           1.146
+6        dim          0.846           0.899
+Ce test porte sur les jours de semaine, pas sur les jours fériés ou événements.
+
+===== Q5 =====
+Taux de non-renouvellement : 0.217
+                    count  mean
+tranche_anciennete             
+(0, 6]                 29  0.24
+(6, 12]                71  0.27
+(12, 24]              136  0.24
+(24, 36]               68  0.21
+(36, 48]               39  0.05
+(48, 60]               17  0.24
+                  count  mean
+quartile_trajets             
+(0.999, 4.0]         99  0.29
+(4.0, 8.0]           90  0.23
+(8.0, 13.0]          93  0.18
+(13.0, 33.0]         78  0.14
+                    count  mean
+incidents_signales             
+0                     226  0.18
+1                     107  0.22
+2                      24  0.50
+3                       3  0.33
+AUC : 0.57
+L'ancienneté est descriptive ; aucune date exacte de départ n'est disponible.
+
+===== Q6 =====
+Abonnés : 500 ; départs : 115 ; contacts pour repérer 50% : 176
+Coût/contact 2 € : contacts 467 ; gain net simulé 4538.0 €
+Coût/contact 5 € : contacts 467 ; gain net simulé 3137.0 €
+Coût/contact 10 € : contacts 257 ; gain net simulé 1366.0 €
+Coût/contact 15 € : contacts 81 ; gain net simulé 561.0 €
+Coût/contact 20 € : contacts 22 ; gain net simulé 232.0 €
+Coût/contact 30 € : contacts 8 ; gain net simulé 48.0 €
+Hypothèses de simulation : valeur abonné = 120 €, succès = 40 %.
+
+===== Q7 =====
+k = 2 inertie = 316.1 silhouette = 0.23
+k = 3 inertie = 240.8 silhouette = 0.28
+k = 4 inertie = 182.1 silhouette = 0.29
+k = 5 inertie = 157.4 silhouette = 0.28
+k = 6 inertie = 140.3 silhouette = 0.27
+k = 7 inertie = 127.9 silhouette = 0.27
+k = 8 inertie = 116.3 silhouette = 0.25
+              nb_stations  interventions  capacite  trafic
+type_station                                              
+0                      52            4.3      16.7     8.8
+1                      33            3.9      23.0    14.3
+2                      13           13.6      18.1     8.4
+3                      42            4.4      28.6     8.6
+type_quartier  bureaux  gare  résidentiel  université
+type_station                                         
+0                   25     2           15          10
+1                   14     2            8           9
+2                    0    13            0           0
+3                   12     4           16          10
+
+===== Q8 =====
+   departs  arrivees  solde
+0      216       241    -25
+1      227       246    -19
+2       62        47     15
+3      195       166     29
+Pas de solde horaire fiable : l'heure réelle d'arrivée n'est pas fournie.
+
+===== Q9 =====
+Zones candidates exploratoires :
+    x_km  y_km  nb_passages
+4   6.5   4.5           69
+2   4.5   4.5           37
+1   4.5   3.5           24
+0   3.5   3.5           22
+5   7.5   4.5           22
+3   6.5   2.5           11
+Stations les plus sollicitées par place :
+    station_id type_quartier  capacite  trafic  trajets_par_place
+84       ST284       bureaux       8.0    12.0               1.50
+98       ST298    université       8.0    11.0               1.38
+100      ST300       bureaux      11.0    15.0               1.36
+92       ST292       bureaux       8.0    10.0               1.25
+24       ST224       bureaux      15.0    18.0               1.20
+75       ST275          gare       8.0     9.0               1.12
+86       ST286   résidentiel      12.0    13.0               1.08
+46       ST246          gare       9.0     9.0               1.00
+
+Fin des analyses Q1 à Q9.
+Résultats enregistrés dans C:\ece\data\projet\Projet_datamining_b3-\resultats\questions
+Rapport texte enregistré dans C:\ece\data\projet\Projet_datamining_b3-\resultats\rapport_analyses.txt

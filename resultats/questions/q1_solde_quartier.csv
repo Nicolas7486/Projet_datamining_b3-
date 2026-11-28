@@ -1,0 +1,5 @@
+type_quartier,departs,arrivees,solde
+bureaux,275.0,250.0,25.0
+gare,92.0,94.0,-2.0
+résidentiel,178.0,201.0,-23.0
+université,155.0,155.0,0.0

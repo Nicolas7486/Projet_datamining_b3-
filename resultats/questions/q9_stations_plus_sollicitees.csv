@@ -1,0 +1,9 @@
+station_id,type_quartier,capacite,trafic,trajets_par_place
+ST284,bureaux,8.0,12.0,1.5
+ST298,université,8.0,11.0,1.38
+ST300,bureaux,11.0,15.0,1.36
+ST292,bureaux,8.0,10.0,1.25
+ST224,bureaux,15.0,18.0,1.2
+ST275,gare,8.0,9.0,1.12
+ST286,résidentiel,12.0,13.0,1.08
+ST246,gare,9.0,9.0,1.0
