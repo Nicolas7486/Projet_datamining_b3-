@@ -1,135 +1,52 @@
-
 import pandas as pd
 import numpy as np
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+RAW = ROOT / "data" / "raw"
+OUT = ROOT / "data" / "processed"
+OUT.mkdir(parents=True, exist_ok=True)
 
-# Chemins des fichiers
-dossier_projet = Path(__file__).resolve().parents[1]
-dossier_raw = dossier_projet / "data" / "raw"
-dossier_resultats = dossier_projet / "data" / "processed"
+def main():
+    stations = pd.read_csv(RAW / "Citycycle_stations.csv")
+    trajets = pd.read_csv(RAW / "Citycycle_trajets.csv")
+    abonnes = pd.read_csv(RAW / "Citycycle_abonnes.csv")
 
-dossier_resultats.mkdir(parents=True, exist_ok=True)
+    print("===== NETTOYAGE =====")
+    print("Trajets avant :", len(trajets))
+    print("Doublons supprimés :", trajets.duplicated().sum())
+    trajets = trajets.drop_duplicates().copy()
 
+    # Recalcul des distances non positives avec les coordonnées des stations.
+    coord = stations.set_index("station_id")[["longitude_km", "latitude_km"]]
+    dx = trajets["station_depart"].map(coord["longitude_km"]) - trajets["station_arrivee"].map(coord["longitude_km"])
+    dy = trajets["station_depart"].map(coord["latitude_km"]) - trajets["station_arrivee"].map(coord["latitude_km"])
+    distance_calculee = np.sqrt(dx**2 + dy**2)
+    boucle = trajets["station_depart"].eq(trajets["station_arrivee"])
+    anomalie = trajets["distance_km"].le(0) & ~boucle
+    print("Distances recalculées :", anomalie.sum())
+    trajets.loc[anomalie, "distance_km"] = distance_calculee.loc[anomalie]
+    trajets.loc[boucle, "distance_km"] = np.nan
 
-# Chargement des données
-stations = pd.read_csv(dossier_raw / "Citycycle_stations.csv")
-trajets = pd.read_csv(dossier_raw / "Citycycle_trajets.csv")
-abonnes = pd.read_csv(dossier_raw / "Citycycle_abonnes.csv")
+    # Seuil conservé du code fourni : à confirmer avec le dictionnaire des données.
+    print("Durées > 180 min :", trajets["duree_min"].gt(180).sum())
+    trajets.loc[trajets["duree_min"].gt(180), "duree_min"] = np.nan
+    trajets.loc[trajets["duree_min"].le(0), "duree_min"] = np.nan
 
-print("Dimensions initiales :")
-print("Stations :", stations.shape)
-print("Trajets :", trajets.shape)
-print("Abonnés :", abonnes.shape)
+    print("Températures manquantes :", trajets["temperature_c"].isna().sum())
+    trajets["temperature_c"] = trajets["temperature_c"].fillna(trajets["temperature_c"].median())
+    print("Abonnements manquants :", trajets["type_abonnement"].isna().sum())
+    trajets["type_abonnement"] = trajets["type_abonnement"].fillna("inconnu")
 
+    print("Trajets après :", len(trajets))
+    print("Valeurs manquantes stations :", stations.isna().sum().sum())
+    print("Valeurs manquantes abonnés :", abonnes.isna().sum().sum())
+    print("Doublons stations / abonnés :", stations.duplicated().sum(), "/", abonnes.duplicated().sum())
 
-# Nettoyage des trajets
-bilan = {}
+    trajets.to_csv(OUT / "trajets_propres.csv", index=False)
+    stations.to_csv(OUT / "stations_propres.csv", index=False)
+    abonnes.to_csv(OUT / "abonnes_propres.csv", index=False)
+    print("Fichiers propres enregistrés dans", OUT)
 
-# Suppression des lignes en double
-bilan["doublons_supprimes"] = trajets.duplicated().sum()
-trajets = trajets.drop_duplicates().copy()
-
-
-# Les distances négatives ou nulles ne sont pas valides
-distances_invalides = trajets["distance_km"] <= 0
-bilan["distances_invalides"] = distances_invalides.sum()
-trajets.loc[distances_invalides, "distance_km"] = np.nan
-
-
-# Les trajets de plus de 180 minutes sont considérés comme anormaux
-durees_anormales = trajets["duree_min"] > 180
-bilan["durees_anormales"] = durees_anormales.sum()
-trajets.loc[durees_anormales, "duree_min"] = np.nan
-
-
-# Remplacement des températures manquantes par la médiane
-bilan["temperatures_manquantes"] = trajets["temperature_c"].isna().sum()
-mediane = trajets["temperature_c"].median()
-trajets["temperature_c"] = trajets["temperature_c"].fillna(mediane)
-
-
-# Les abonnements manquants sont indiqués comme inconnus
-bilan["abonnements_manquants"] = trajets["type_abonnement"].isna().sum()
-trajets["type_abonnement"] = trajets["type_abonnement"].fillna("inconnu")
-
-
-# Conversion de la pluie en valeurs numériques
-trajets["pluie"] = (
-    trajets["pluie"].str.strip().str.lower()
-    .map({"oui": 1, "non": 0})
-)
-
-
-# Calcul de la vitesse pour les trajets exploitables
-trajets["vitesse_kmh"] = (
-    trajets["distance_km"] / (trajets["duree_min"] / 60)
-)
-
-bilan["vitesses_superieures_35"] = (
-    trajets["vitesse_kmh"] > 35
-).sum()
-
-
-# Création de nouvelles colonnes
-trajets["weekend"] = trajets["jour"].isin(["sam", "dim"]).astype(int)
-
-trajets["pointe"] = trajets["heure"].isin(
-    [7, 8, 9, 17, 18, 19]
-).astype(int)
-
-trajets["boucle"] = (
-    trajets["station_depart"] == trajets["station_arrivee"]
-)
-
-
-# Ajout du type de quartier des stations de départ et d'arrivée
-stations_depart = stations[
-    ["station_id", "type_quartier"]
-].rename(columns={
-    "station_id": "station_depart",
-    "type_quartier": "quartier_depart"
-})
-
-stations_arrivee = stations[
-    ["station_id", "type_quartier"]
-].rename(columns={
-    "station_id": "station_arrivee",
-    "type_quartier": "quartier_arrivee"
-})
-
-trajets = trajets.merge(
-    stations_depart,
-    on="station_depart",
-    how="left"
-)
-
-trajets = trajets.merge(
-    stations_arrivee,
-    on="station_arrivee",
-    how="left"
-)
-
-
-# Préparation des données des abonnés
-abonnes["renouvele"] = (
-    abonnes["a_renouvele"].str.strip().str.lower()
-    .map({"oui": 1, "non": 0})
-)
-
-
-# Enregistrement des fichiers nettoyés
-trajets.to_csv(dossier_resultats / "trajets_propres.csv", index=False)
-stations.to_csv(dossier_resultats / "stations_propres.csv", index=False)
-abonnes.to_csv(dossier_resultats / "abonnes_propres.csv", index=False)
-
-
-# Affichage du bilan
-bilan["trajets_avant"] = 760
-bilan["trajets_apres"] = len(trajets)
-
-print("\nBilan du nettoyage :")
-for nom, valeur in bilan.items():
-    print(nom, ":", valeur)
-
-print("\nNettoyage terminé !")
+if __name__ == "__main__":
+    main()
